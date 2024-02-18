@@ -19,39 +19,49 @@ const AuthForm = () => {
     const enteredPassword = passwordInputRef.current.value;
 
     // optional: Add Validation
-setIsLoading(true);
-  if(isLogin){
-  // Logic for login
-
-  }else{
-  fetch("https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=[API_KEY]=AIaSyBZhsabDexE9bgxnZ4DiRlrCN9xe24",
-  {
-   mehod: 'POST',
-   body: JSON.stringify({
-   password: enteredPassword,
-   returnSecureToken: true
-  }),
-  headers: {
-   'Content-Type':'application/json'
-  },
-  }
-  ).then((res) => {
-    setIsLoading(false);
-   if(res.ok){
-    // ...
-   }else{
-    return res.json().then((data) => {
-    // show an error modal
-    let errorMessage = 'Authentication failed!'
-    // if(data && data.error && data.error.message){
-    // errorMessage = data.error.message;
-    // }
-    alert(errorMessage);
-    });
-   }
-  })
-  }
-};
+    setIsLoading(true);
+    let url;
+    if (isLogin) {
+      // Logic for login
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=[API_KEY]=AIzaSyCgjxPSkmrjs8kwP6LE5cjZPLF4iJHmleM";
+    } else {
+      url =
+        "https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=[API_KEY]=AIzaSyCgjxPSkmrjs8kwP6LE5cjZPLF4iJHmleM";
+    }
+    fetch(url, {
+      mehod: "POST",
+      body: JSON.stringify({
+        password: enteredPassword,
+        returnSecureToken: true,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        setIsLoading(false);
+        if (res.ok) {
+          // ...
+          return res.json();
+        } else {
+          return res.json().then((data) => {
+            let errorMessage = "Authentication failed";
+            // if(data && data.error && data.error.message){
+            // errorMessage = data.error.message;
+            // }
+            alert(errorMessage);
+            throw new Error(errorMessage);
+          });
+        }
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((err) => {
+        alert(err.Message);
+      });
+  };
 
   return (
     <section className={classes.auth}>
@@ -71,7 +81,9 @@ setIsLoading(true);
           />
         </div>
         <div className={classes.actions}>
-          {!isLoading && <button>{isLogin ? 'Login' : 'create Account'}</button>}
+          {!isLoading && (
+            <button>{isLogin ? "Login" : "create Account"}</button>
+          )}
           {isLoading && <p>Sending Request...</p>}
           <button
             type="button"
